@@ -221,7 +221,7 @@ public class SysSettingsManager : ISysSettingsManager
 		VwSysSetting sysSetting = GetSysSettingByCode(code);
 		string optionsType = string.IsNullOrWhiteSpace(valueTypeName)
 			? sysSetting.ValueTypeName : valueTypeName;
-
+		_logger.WriteError($"optionsType: {optionsType}");
 		if (optionsType.Contains("Text") || optionsType.Contains("Date") ||optionsType.Contains("Time") || optionsType.Contains("Lookup")) {
 			if (optionsType == "Lookup") {
 				bool isGuid = Guid.TryParse(value.ToString(), out Guid id);
@@ -235,15 +235,17 @@ public class SysSettingsManager : ISysSettingsManager
 			if (new[] {"Date", "DateTime", "Time"}.Contains(optionsType)) {
 				value = DateTime.Parse(value.ToString(), CultureInfo.InvariantCulture).ToString("yyyy-MM-ddTHH:mm:ss.fff");
 			}
-
+			_logger.WriteError($"value: {value}");
 			//Enclosed opts.Value in "", otherwise update fails for all text settings
 			requestData = "{\"isPersonal\":false,\"sysSettingsValues\":{" + $"\"{code}\":\"{value}\"" + "}}";
 		} else {
+			_logger.WriteError($"value: {value}");
 			if (optionsType.Contains("Boolean")) {
 				value = bool.Parse(value.ToString()).ToString().ToLower(CultureInfo.InvariantCulture);
 			}
 
 			requestData = "{\"isPersonal\":false,\"sysSettingsValues\":{" + $"\"{code}\":{value}" + "}}";
+			_logger.WriteError($"requestData: {requestData}");
 		}
 		string postSysSettingsValuesUrl
 			= _serviceUrlBuilder.Build("DataService/json/SyncReply/PostSysSettingsValues");
